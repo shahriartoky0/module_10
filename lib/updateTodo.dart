@@ -3,23 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:module_10/todo.dart';
 import 'package:module_10/homeScreen.dart';
 
-class AddToDo extends StatefulWidget {
-  AddToDo({
-    super.key, required this.onAddTap,
+class updateTodo extends StatefulWidget {
+  const updateTodo({
+    super.key, required this.onTodoUpdate, required this.obj,
   });
-  final Function (todo) onAddTap; // here the class name is added as a parameter
+
+  final todo obj ;
+  final Function (String) onTodoUpdate; // here the class name is added as a parameter
 
   @override
-  State<AddToDo> createState() => _AddToDoState();
+  State<updateTodo> createState() => _updateTodoState();
 }
 
-class _AddToDoState extends State<AddToDo> {
-  final TextEditingController addTaskTEController = TextEditingController();
+
+class _updateTodoState extends State<updateTodo> {
+  // final TextEditingController addTaskTEController = TextEditingController(text: '${widget.obj.details}'); //initialized later
+  late final TextEditingController addTaskTEController = TextEditingController(text: widget.obj.details);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    mySnackBar(context, message){
+      return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
     return Padding(
       padding: EdgeInsets.all(20),
       child: Form(
@@ -30,7 +37,7 @@ class _AddToDoState extends State<AddToDo> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Add To-Do',
+                  'Edit To-Do',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 IconButton(
@@ -46,7 +53,7 @@ class _AddToDoState extends State<AddToDo> {
             TextFormField(
               controller: addTaskTEController,
               validator: (String? value) {
-                if (value?.trim().isEmpty ?? true) {
+                if (value?.isEmpty ?? true) {
                   return 'Please Enter a value';
                 }
                 return null;
@@ -62,26 +69,20 @@ class _AddToDoState extends State<AddToDo> {
               child: ElevatedButton(
                 onPressed: () {
                   if(_formKey.currentState!.validate()){
-                    String text = addTaskTEController.text ;
-                  todo obj =  todo(details: text, currentTime: DateTime.now(), updatedTime: DateTime.now());
-                    print(obj.currentTime);
-                    print(obj.details);
-                    widget.onAddTap(obj);
-                    addTaskTEController.text = ' ';
-                    mySnackBar (context , 'To Do Added');
-
+                    String text = addTaskTEController.text.trim() ;
+                    widget.onTodoUpdate(text);
+                    mySnackBar (context , 'To Do Updated');
+                    Navigator.pop(context);
+                    print(text);
 
                   }
                 },
-                child: const Text("Add"),
+                child: const Text("Update"),
               ),
             )
           ],
         ),
       ),
     );
-  }
-  mySnackBar(context, message){
-    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }
