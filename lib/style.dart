@@ -10,3 +10,6 @@ InputDecoration appTextInput (hint){
 
   ) ;
 }
+ButtonStyle alertButton (){
+  return TextButton.styleFrom(foregroundColor: Colors.cyan);
+}

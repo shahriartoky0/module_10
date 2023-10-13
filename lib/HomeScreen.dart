@@ -35,10 +35,10 @@ class _HomeScreenUI extends State<HomeScreen> {
               ))
         ],
         backgroundColor: Colors.white70,
-        elevation: 8,
+        elevation: 5,
       ),
       body: Padding(
-        padding: EdgeInsets.all(5),
+        padding: const EdgeInsets.all(5),
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Form(
@@ -56,6 +56,7 @@ class _HomeScreenUI extends State<HomeScreen> {
                     return null;
                   },
                   controller: _titleTEController,
+                  textInputAction: TextInputAction.next,
                   decoration: appTextInput("Add Title"),
                 ),
                 const SizedBox(
@@ -70,6 +71,7 @@ class _HomeScreenUI extends State<HomeScreen> {
                   },
                   controller: _descriptionTEController,
                   decoration: appTextInput('Add Description'),
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(
                   height: 8,
@@ -90,9 +92,10 @@ class _HomeScreenUI extends State<HomeScreen> {
                             addValue(obj);
                             _titleTEController.text = '';
                             _descriptionTEController.text = '';
+                            mySnackBar(context, 'Item Added');
                           }
                         },
-                        child: Text('Add'))
+                        child: const Text('Add'))
                   ],
                 ),
                 const SizedBox(
@@ -112,7 +115,60 @@ class _HomeScreenUI extends State<HomeScreen> {
                           showDialog(
                               context: context,
                               builder: (context) {
-                                return editInfo();
+                                // return editInfo();
+                                return AlertDialog(
+                                  title: const Text(' Alert'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const SizedBox(
+                                        height: 3,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                showModalBottomSheet(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return editInfo(
+                                                        onTapUpgrade: (String
+                                                                title,
+                                                            String
+                                                                description) {
+                                                          updateValue(
+                                                              index: index,
+                                                              updatedTitle:
+                                                                  title,
+                                                              updatedDescription:
+                                                                  description);
+                                                        },
+                                                        gotItem:
+                                                            itemDetails[index],
+                                                      );
+                                                    });
+                                              },
+                                              style: alertButton(),
+                                              child: const Text('Edit')),
+                                          TextButton(
+                                              onPressed: () {
+                                                //Todo: Delete code
+                                                String oldTitle = itemDetails[index].title;
+                                                deleteValue(index);
+                                                Navigator.pop(context);
+                                                mySnackBar(
+                                                    context, 'Item titled $oldTitle Deleted !');
+                                              },
+                                              style: alertButton(),
+                                              child: const Text('Delete')),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                );
                               });
                         },
                       );
@@ -136,11 +192,26 @@ class _HomeScreenUI extends State<HomeScreen> {
     itemDetails.add(obj);
     setState(() {});
   }
-// function to Delete Values
-void deleteValue (index)
-{
-  itemDetails.removeAt(index);
-  setState(() {});
-}
 
+// function to Delete Values
+  void deleteValue(index) {
+    itemDetails.removeAt(index);
+    setState(() {});
+  }
+// function to Update Values
+  void updateValue(
+      {required int index,
+      required String updatedTitle,
+      required String updatedDescription}) {
+    itemDetails[index].title = updatedTitle;
+    itemDetails[index].description = updatedDescription;
+    setState(() {});
+  }
+// function to show SnackBar
+  mySnackBar(context, message) {
+    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 1),
+    ));
+  }
 }
